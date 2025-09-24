@@ -1,0 +1,153 @@
+/* Definições de cores e variáveis */
+:root {
+    --primary-color: #e74c3c; /* Vermelho vibrante */
+    --primary-dark: #c0392b; /* Vermelho mais escuro para o fundo da sidebar e botões */
+    --secondary-color: #f39c12; /* Laranja complementar */
+    --light-bg: #f8f9fa;
+    --dark-text: #2c3e50;
+    --gradient: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Estilos globais do corpo da página */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+    color: var(--dark-text);
+    min-height: 100vh;
+}
+
+/* Layout do contêiner principal */
+.main-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar - Barra Lateral */
+.sidebar {
+    width: 280px;
+    background-color: var(--primary-dark);
+    color: white;
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease-in-out;
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.sidebar-header .logo {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.sidebar-header h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white !important;
+}
+
+.nav-link i {
+    width: 25px;
+}
+
+/* Conteúdo principal do dashboard */
+.content-wrapper {
+    flex-grow: 1;
+    padding: 3rem;
+    background-color: var(--light-bg);
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* Títulos das páginas */
+.page-title {
+    font-weight: 700;
+    color: var(--dark-text);
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    color: #777;
+    margin-bottom: 2rem;
+}
+
+/* Cards de atalho */
+.shortcut-card {
+    background: white;
+    border-radius: 15px;
+    border: none;
+    padding: 2rem;
+    text-decoration: none;
+    color: var(--dark-text);
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.shortcut-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.shortcut-icon {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.shortcut-title {
+    font-weight: 600;
+}
+
+.shortcut-text {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 1rem;
+        z-index: 1000;
+    }
+    .sidebar-header, .sidebar-bottom {
+        display: none;
+    }
+    .content-wrapper {
+        padding: 2rem 1rem;
+        margin-bottom: 6rem; /* Espaço para a barra de navegação no rodapé */
+    }
+    .nav-link {
+        text-align: center;
+        padding: 0.5rem;
+        margin: 0 5px;
+    }
+    .nav-link span {
+        display: none;
+    }
+}
