@@ -1,0 +1,16 @@
+<?php
+
+$host = 'localhost';
+$port = '6543';
+$dbname = 'database';
+$user = 'user';
+$pass = ''; // sua senha
+
+try {
+    $pdo = new PDO("pgsql:host=$host;port=$port;dbname=$dbname", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    // echo "Conexão com PostgreSQL bem-sucedida!";
+} catch (PDOException $e) {
+    die("Erro na conexão com o banco de dados: " . $e->getMessage());
+}
+?>
