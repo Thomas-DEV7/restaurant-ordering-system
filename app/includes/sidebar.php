@@ -20,9 +20,9 @@
         </ul>
     <hr class="text-white-50 my-3 d-none d-md-block">
     <div class="mt-auto sidebar-bottom d-none d-md-block">
-        <p class="text-white-50 mb-1">Olá, <?php echo $userName; ?>!</p>
-        <a href="logout.php" class="nav-link">
-            <i class="fas fa-sign-out-alt me-2"></i> <span>Sair</span>
-        </a>
-    </div>
+    <p class="text-white-50 mb-1">Olá, <?php echo $userName; ?>!</p>
+    <a href="logout.php" class="nav-link">
+        <i class="fas fa-sign-out-alt me-2"></i> <span>Sair</span>
+    </a>
+</div>
 </div>
