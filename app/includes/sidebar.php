@@ -1,4 +1,3 @@
-
 <div class="sidebar d-flex flex-column">
     <div class="sidebar-header">
         <div class="logo">
@@ -17,12 +16,27 @@
                 <i class="fas fa-list-alt me-2"></i> <span>Cardápio</span>
             </a>
         </li>
-        </ul>
+        <li class="nav-item">
+            <a class="nav-link <?php echo ($currentPage == 'comandas.php') ? 'active' : ''; ?>" href="comandas.php">
+                <i class="fas fa-clipboard-list me-2"></i> <span>Comanda Digital</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?php echo ($currentPage == 'kitchen_display.php') ? 'active' : ''; ?>" href="kitchen_display.php" target="_blank">
+                <i class="fas fa-tv me-2"></i> <span>Visualização Cozinha</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?php echo ($currentPage == 'orders_management.php') ? 'active' : ''; ?>" href="orders_management.php">
+                <i class="fas fa-tasks me-2"></i> <span>Monitor de Pedidos</span>
+            </a>
+        </li>
+    </ul>
     <hr class="text-white-50 my-3 d-none d-md-block">
     <div class="mt-auto sidebar-bottom d-none d-md-block">
-    <p class="text-white-50 mb-1">Olá, <?php echo $userName; ?>!</p>
-    <a href="logout.php" class="nav-link">
-        <i class="fas fa-sign-out-alt me-2"></i> <span>Sair</span>
-    </a>
-</div>
+        <p class="text-white-50 mb-1">Olá, <?php echo $userName; ?>!</p>
+        <a href="logout.php" class="nav-link">
+            <i class="fas fa-sign-out-alt me-2"></i> <span>Sair</span>
+        </a>
+    </div>
 </div>
