@@ -31,6 +31,11 @@
                 <i class="fas fa-tasks me-2"></i> <span>Monitor de Pedidos</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link <?php echo ($currentPage == 'financial_report.php') ? 'active' : ''; ?>" href="financial_report.php">
+                <i class="fas fa-hand-holding-usd me-2"></i> <span>Relatório Financeiro</span>
+            </a>
+        </li>
     </ul>
     <hr class="text-white-50 my-3 d-none d-md-block">
     <div class="mt-auto sidebar-bottom d-none d-md-block">
