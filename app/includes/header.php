@@ -1,5 +1,4 @@
 <?php
-// app/includes/header.php
 session_start();
 
 // Proteção de página: redireciona se o usuário não estiver logado
@@ -11,7 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 $userName = htmlspecialchars($_SESSION['user_name']);
 $userRole = htmlspecialchars($_SESSION['user_role']);
 
-// Pega o nome do arquivo atual para destacar o item de menu
 $currentPage = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>

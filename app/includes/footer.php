@@ -1,5 +1,4 @@
 <?php
-// app/includes/footer.php
 $userRole = $_SESSION['user_role'] ?? 'guest';
 $isAdmin = ($userRole === 'admin');
 ?>

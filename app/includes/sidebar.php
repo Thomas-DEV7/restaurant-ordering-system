@@ -1,6 +1,4 @@
 <?php
-// app/includes/sidebar.php
-// ... (código que define $currentPage, $userName, etc.) ...
 
 $userRole = $_SESSION['user_role'] ?? 'guest';
 $isAdmin = ($userRole === 'admin');
@@ -36,7 +34,7 @@ $isAdmin = ($userRole === 'admin');
         </li>
 
         <li class="nav-item">
-            <a class="nav-link <?php echo ($currentPage == 'kitchen_display.php') ? 'active' : ''; ?>" href="kitchen_display.php" target="_blank">
+            <a class="nav-link <?php echo ($currentPage == 'kitchen_display.php') ? 'active' : ''; ?>" href="kitchen_display.php">
                 <i class="fas fa-tv me-2"></i> <span>Visualização Cozinha</span>
             </a>
         </li>
