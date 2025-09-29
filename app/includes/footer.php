@@ -24,6 +24,10 @@
         <i class="fas fa-tasks"></i>
         <small>Pedidos</small>
     </a>
+    <a class="nav-link <?php echo ($currentPage == 'financial_report.php') ? 'active' : ''; ?>" href="financial_report.php">
+        <i class="fas fa-hand-holding-usd"></i>
+        <small>Financeiro</small>
+    </a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
