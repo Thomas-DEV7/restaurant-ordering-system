@@ -37,7 +37,7 @@ $isAdmin = ($userRole === 'admin');
         </a>
     <?php endif; ?>
 
-    <a class="nav-link" href="logout.php" title="Sair como <?php echo htmlspecialchars($userName); ?>">
+      <a class="nav-link" href="logout.php" title="Sair como <?php echo htmlspecialchars($userName); ?>">
         <i class="fas fa-sign-out-alt"></i>
         <small>Sair</small>
     </a>
