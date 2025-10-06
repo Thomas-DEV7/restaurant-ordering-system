@@ -247,76 +247,43 @@ try {
         }
 
 
-        // --- Ação: get_daily_summary (RELATÓRIO FINANCEIRO DIÁRIO) ---
-        if ($action === 'get_daily_summary') {
-            try {
-                // Data de hoje
-                $todayStart = date('Y-m-d 00:00:00');
-                $todayEnd = date('Y-m-d 23:59:59');
+        // --- Ação: get_financial_report (Relatório Financeiro Diário) ---
+        if ($action === 'get_financial_report') {
 
-                // --- A) TOTAL DE PEDIDOS FECHADOS HOJE ---
-                $sql_orders = "
-            SELECT COUNT(id) as total_orders_closed
-            FROM orders 
-            WHERE status = 'completed'
-            AND order_time BETWEEN :today_start AND :today_end
-        ";
-                $stmt_orders = $pdo->prepare($sql_orders);
-                $stmt_orders->execute(['today_start' => $todayStart, 'today_end' => $todayEnd]);
-                $orders_data = $stmt_orders->fetch(PDO::FETCH_ASSOC);
+            // Define a data de hoje para o filtro
+            $today_start = date('Y-m-d 00:00:00');
+            $today_end = date('Y-m-d 23:59:59');
 
-                // --- B) VENDAS BRUTAS (TOTAL DOS ITENS) ---
-                $sql_subtotal = "
-            SELECT COALESCE(SUM(oi.quantity * oi.price), 0) as total_subtotal
-            FROM orders o
-            JOIN order_items oi ON o.id = oi.order_id
-            WHERE o.status = 'completed'
-            AND o.order_time BETWEEN :today_start AND :today_end
-        ";
-                $stmt_subtotal = $pdo->prepare($sql_subtotal);
-                $stmt_subtotal->execute(['today_start' => $todayStart, 'today_end' => $todayEnd]);
-                $subtotal_data = $stmt_subtotal->fetch(PDO::FETCH_ASSOC);
+            // Consulta que agrega todos os dados de pedidos CONCLUÍDOS no dia
+            $sql = "
+                SELECT
+                    COUNT(DISTINCT o.id) AS total_orders,
+                    COALESCE(SUM(oi.price * oi.quantity), 0.00) AS total_bruto_itens
+                FROM orders o
+                JOIN order_items oi ON o.id = oi.order_id
+                WHERE o.status = 'completed'
+                AND o.order_time >= :start_date 
+                AND o.order_time <= :end_date
+            ";
 
-                // --- C) TAXA DE SERVIÇO (10%) ---
-                // Total devido (10% das vendas brutas)
-                $total_10_percent_due = (float)($subtotal_data['total_subtotal'] ?? 0) * 0.10;
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(['start_date' => $today_start, 'end_date' => $today_end]);
+            $report_data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                // Total já recebido (pedidos marcados como paid_10_percent)
-                $sql_received = "
-            SELECT COALESCE(SUM(oi.quantity * oi.price), 0) as total_received
-            FROM orders o
-            JOIN order_items oi ON o.id = oi.order_id
-            WHERE o.status = 'completed'
-            AND o.paid_10_percent = 1
-            AND o.order_time BETWEEN :today_start AND :today_end
-        ";
-                $stmt_received = $pdo->prepare($sql_received);
-                $stmt_received->execute(['today_start' => $todayStart, 'today_end' => $todayEnd]);
-                $received_data = $stmt_received->fetch(PDO::FETCH_ASSOC);
+            // Cálculos em PHP
+            $bruto_itens = (float)($report_data['total_bruto_itens'] ?? 0);
+            $taxa_servico = $bruto_itens * 0.10;
+            $total_faturado = $bruto_itens * 1.10; // Bruto + Taxa
 
-                $total_10_percent_received = (float)($received_data['total_received'] ?? 0) * 0.10;
-
-                // --- D) TOTAL FATURADO (VENDAS BRUTAS + TAXA RECEBIDA) ---
-                $total_billed_amount = (float)($subtotal_data['total_subtotal'] ?? 0) + $total_10_percent_received;
-
-                // Resposta JSON
-                $response = [
-                    'success' => true,
-                    'data' => [
-                        'total_orders_closed' => (int)($orders_data['total_orders_closed'] ?? 0),
-                        'total_subtotal' => (float)($subtotal_data['total_subtotal'] ?? 0),
-                        'total_10_percent_due' => $total_10_percent_due,
-                        'total_10_percent_received' => $total_10_percent_received,
-                        'total_billed_amount' => $total_billed_amount,
-                        'report_date' => date('d/m/Y')
-                    ]
-                ];
-            } catch (PDOException $e) {
-                $response = [
-                    'success' => false,
-                    'message' => 'Erro de banco de dados: ' . $e->getMessage()
-                ];
-            }
+            $response = [
+                'success' => true,
+                'data' => [
+                    'comandas_fechadas' => (int)($report_data['total_orders'] ?? 0),
+                    'vendas_brutas' => $bruto_itens,
+                    'taxa_servico' => $taxa_servico,
+                    'total_faturado' => $total_faturado
+                ]
+            ];
         }
 
 
@@ -535,6 +502,58 @@ try {
                     'success' => false,
                     'message' => 'Erro de banco de dados: ' . $e->getMessage()
                 ];
+            }
+        }
+        // --- Ação: get_all_tables_with_status (Gerenciamento de Mesas) ---
+        if ($action === 'get_all_tables_with_status') {
+            // Consulta para listar todas as mesas e as informações do pedido pendente associado
+            $sql = "
+                SELECT 
+                    t.id AS table_id,
+                    t.table_number,
+                    t.status,
+                    o.id AS order_id,
+                    o.order_time,
+                    u.name AS waiter_name
+                FROM tables t
+                LEFT JOIN orders o ON t.id = o.table_id AND o.status = 'pending'
+                LEFT JOIN users u ON o.waiter_id = u.id
+                ORDER BY t.id ASC
+            ";
+
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            $tables_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $response = ['success' => true, 'data' => $tables_data];
+        }
+
+        // --- Ação POST: force_release_table (Nova Ação POST) ---
+        if ($action === 'force_release_table' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = json_decode(file_get_contents('php://input'), true);
+            $table_id = $data['table_id'] ?? null;
+
+            if (!$table_id) {
+                $response = ['success' => false, 'message' => 'ID da mesa ausente.'];
+                echo json_encode($response);
+                exit;
+            }
+
+            $pdo->beginTransaction();
+            try {
+                // 1. Marca o pedido pendente como "cancelado" ou "fechado" (para não perder o histórico)
+                $stmt = $pdo->prepare("UPDATE orders SET status = 'cancelled' WHERE table_id = :table_id AND status = 'pending'");
+                $stmt->execute(['table_id' => $table_id]);
+
+                // 2. Libera a mesa
+                $stmt = $pdo->prepare("UPDATE tables SET status = 'available' WHERE id = :table_id");
+                $stmt->execute(['table_id' => $table_id]);
+
+                $pdo->commit();
+                $response = ['success' => true, 'message' => 'Mesa liberada e pedido cancelado.'];
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                $response = ['success' => false, 'message' => 'Erro ao forçar liberação: ' . $e->getMessage()];
             }
         }
     }
