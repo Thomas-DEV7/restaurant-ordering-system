@@ -12,12 +12,14 @@ $isAdmin = ($userRole === 'admin');
         <h2>Restaurante</h2>
     </div>
     <ul class="nav flex-column mb-auto">
+        <?php if ($isAdmin): ?>
 
         <li class="nav-item">
             <a class="nav-link <?php echo ($currentPage == 'dashboard.php') ? 'active' : ''; ?>" href="dashboard.php">
                 <i class="fas fa-chart-line me-2"></i> <span>Dashboard</span>
             </a>
         </li>
+         <?php endif; ?>
 
         <?php if ($isAdmin): ?>
             <li class="nav-item">
@@ -36,6 +38,11 @@ $isAdmin = ($userRole === 'admin');
         <li class="nav-item">
             <a class="nav-link <?php echo ($currentPage == 'kitchen_display.php') ? 'active' : ''; ?>" href="kitchen_display.php">
                 <i class="fas fa-tv me-2"></i> <span>Visualização Cozinha</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?php echo ($currentPage == 'table_management.php') ? 'active' : ''; ?>" href="table_management.php">
+                <i class="fas fa-table me-2"></i> <span>Gerenciamento de Mesas</span>
             </a>
         </li>
 
