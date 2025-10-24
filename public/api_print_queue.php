@@ -20,19 +20,19 @@ try {
         $stmt = $pdo->prepare("
             SELECT 
                 k.id as kitchen_order_id,
-                -- Formato TO_CHAR é usado para garantir compatibilidade com new Date() do JavaScript
                 TO_CHAR(k.time_sent, 'YYYY-MM-DD HH24:MI:SS') as time_sent, 
                 k.status as item_status,
                 t.table_number,
                 oi.quantity,
                 p.name AS product_name,
-                o.id AS order_id
+                o.id AS order_id,
+                o.observation
             FROM kitchen_orders k
             JOIN order_items oi ON k.order_item_id = oi.id
             JOIN orders o ON oi.order_id = o.id
             JOIN tables t ON o.table_id = t.id
             JOIN products p ON oi.product_id = p.id
-            WHERE k.status IN ('sent', 'in_progress') -- Mostra itens em espera e em preparo
+            WHERE k.status IN ('sent', 'in_progress')
             ORDER BY k.time_sent ASC
         ");
         $stmt->execute();
@@ -47,6 +47,7 @@ try {
                     'order_id' => $item['order_id'],
                     'table_number' => $item['table_number'],
                     'time_sent' => $item['time_sent'],
+                    'observation' => $item['observation'] ?? '',
                     'items' => [],
                     'kitchen_order_ids' => [] 
                 ];
@@ -104,8 +105,38 @@ try {
                 }
             }
         }
-    }
 
+        // ⭐ NOVA AÇÃO: add_order_observation ⭐
+        if ($action === 'add_order_observation') {
+            $order_id = $data['order_id'] ?? null;
+            $observation = $data['observation'] ?? '';
+
+            if (!$order_id) {
+                $response = ['success' => false, 'message' => 'ID do pedido não especificado.'];
+            } else {
+                try {
+                    // Verifica se o pedido existe
+                    $stmt = $pdo->prepare("SELECT id FROM orders WHERE id = :order_id");
+                    $stmt->execute(['order_id' => $order_id]);
+                    
+                    if (!$stmt->fetchColumn()) {
+                        $response = ['success' => false, 'message' => 'Pedido não encontrado. ID: ' . $order_id];
+                    } else {
+                        // Atualiza a observação
+                        $stmt = $pdo->prepare("UPDATE orders SET observation = :observation WHERE id = :order_id");
+                        $stmt->execute([
+                            'observation' => trim($observation),
+                            'order_id' => $order_id
+                        ]);
+
+                        $response = ['success' => true, 'message' => 'Observação salva com sucesso!'];
+                    }
+                } catch (Exception $e) {
+                    $response = ['success' => false, 'message' => 'Erro ao salvar observação: ' . $e->getMessage()];
+                }
+            }
+        }
+    }
 
 } catch (PDOException $e) {
     http_response_code(500);
